@@ -328,3 +328,26 @@ code {
   font-size: 0.85rem;
   white-space: pre-wrap;
 }
+
+/* Cue / loop controls row in DeckPanel */
+.cue-loop-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.cue-label,
+.loop-range {
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Active state for Loop ON button */
+.btn.ghost.active {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(76, 194, 255, 0.08);
+}

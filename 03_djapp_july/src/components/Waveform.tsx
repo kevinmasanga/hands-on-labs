@@ -14,15 +14,19 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import type { TrackPeaks } from '../track';
 
 interface Props {
-  peaks: TrackPeaks | null;
-  position: number; // normalized 0..1
-  onSeek: (norm: number) => void;
+  peaks:       TrackPeaks | null;
+  position:    number; // normalized 0..1
+  onSeek:      (norm: number) => void;
+  cueNorm?:    number;  // default -1 (not set)
+  loopIn?:     number;  // default -1
+  loopOut?:    number;  // default -1
+  loopActive?: boolean; // default false
 }
 
 const CACHE_HEIGHT = 256; // offscreen bitmap height; scaled to the canvas at blit time
 const MIN_WINDOW = 0.02; // closest zoom: 2% of the track visible
 
-export default function Waveform({ peaks, position, onSeek }: Props) {
+export default function Waveform({ peaks, position, onSeek, cueNorm, loopIn, loopOut, loopActive }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const cacheRef = useRef<HTMLCanvasElement | null>(null);
   const [windowFrac, setWindowFrac] = useState(1); // fraction of track visible (1 = all)
@@ -80,6 +84,7 @@ export default function Waveform({ peaks, position, onSeek }: Props) {
   );
 
   const draw = useCallback(() => {
+    // eslint-disable-next-line @typescript-eslint/no-shadow
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
@@ -115,15 +120,73 @@ export default function Waveform({ peaks, position, onSeek }: Props) {
     // Blit just the visible slice, scaled to the canvas.
     ctx.drawImage(cache, start, 0, win, cache.height, 0, 0, cssW, cssH);
 
-    // Playhead at its true position within the visible window.
-    const playX = ((position * total - start) / win) * cssW;
+    // Convert normalized track position → canvas x, accounting for zoom window.
+    const toX = (norm: number) => ((norm * total - start) / win) * cssW;
+
+    // 1. Loop region fill (drawn first so lines appear on top).
+    const li = loopIn  ?? -1;
+    const lo = loopOut ?? -1;
+    if (li >= 0 && lo > li) {
+      ctx.fillStyle = (loopActive ?? false)
+        ? 'rgba(100,210,180,0.18)'
+        : 'rgba(100,210,180,0.07)';
+      const x1 = toX(li);
+      const x2 = toX(lo);
+      ctx.fillRect(x1, 0, x2 - x1, cssH);
+    }
+
+    // 2. Loop IN marker (green).
+    if (li >= 0) {
+      const x = toX(li);
+      ctx.strokeStyle = '#4caf50';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, cssH);
+      ctx.stroke();
+      ctx.fillStyle = '#4caf50';
+      ctx.font = 'bold 9px system-ui';
+      ctx.fillText('IN', x + 2, 10);
+    }
+
+    // 3. Loop OUT marker (orange).
+    if (lo >= 0) {
+      const x = toX(lo);
+      ctx.strokeStyle = '#ff9800';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, cssH);
+      ctx.stroke();
+      ctx.fillStyle = '#ff9800';
+      ctx.font = 'bold 9px system-ui';
+      ctx.fillText('OUT', x + 2, 10);
+    }
+
+    // 4. Cue marker (yellow) — drawn after loop markers, before playhead.
+    const cue = cueNorm ?? -1;
+    if (cue >= 0) {
+      const x = toX(cue);
+      ctx.strokeStyle = '#ffeb3b';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, cssH);
+      ctx.stroke();
+      ctx.fillStyle = '#ffeb3b';
+      ctx.font = 'bold 9px system-ui';
+      ctx.fillText('CUE', x + 2, 10);
+    }
+
+    // 5. Playhead — always drawn last, always on top.
+    const playX = toX(position);
     ctx.strokeStyle = '#ff6b6b';
     ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.moveTo(playX, 0);
     ctx.lineTo(playX, cssH);
     ctx.stroke();
-  }, [position, windowFor]);
+  }, [position, windowFor, cueNorm, loopIn, loopOut, loopActive]);
 
   useEffect(() => {
     draw();

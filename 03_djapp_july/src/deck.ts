@@ -30,12 +30,16 @@ export interface DeckState {
   playing: boolean;
   baseNorm: number; // normalized position of the last seek (0..1)
   seekGen: number; // bump to force the transport accumulator to reset
-  tempo: number; // playback rate ratio; 1.0 in P1 (varispeed arrives in P4)
+  tempo: number; // playback rate ratio; 1.0 = original speed (varispeed)
   volume: number; // 0..1
   eqLow: number; // dB, -12..12
   eqMid: number; // dB, -12..12
   eqHigh: number; // dB, -12..12
   filterCutoff: number; // -1 (LPF down to 100Hz) .. 0 (bypass) .. 1 (HPF up to 10kHz)
+  cueNorm: number;    // normalized cue position; -1 = not set
+  loopIn: number;     // normalized loop-in; -1 = not set
+  loopOut: number;    // normalized loop-out; -1 = not set
+  loopActive: boolean;
 }
 
 export function initialDeckState(id: string): DeckState {
@@ -51,6 +55,10 @@ export function initialDeckState(id: string): DeckState {
     eqMid: 0,
     eqHigh: 0,
     filterCutoff: 0,
+    cueNorm: -1,
+    loopIn: -1,
+    loopOut: -1,
+    loopActive: false,
   };
 }
 
@@ -125,7 +133,20 @@ export function buildDeckSignal(s: DeckState): DeckSignal | null {
   const seekTrig = el.const({ key: `${s.id}_seek`, value: s.seekGen });
   const base = el.const({ key: `${s.id}_base`, value: s.baseNorm });
 
-  const position = el.add(base, el.accum(inc, seekTrig));
+  const rawPos = el.add(base, el.accum(inc, seekTrig));
+
+  let position: NodeRepr_t;
+  if (s.loopActive && s.loopIn >= 0 && s.loopOut > s.loopIn) {
+    // Floored-mod wrap: position = loopIn + ((rawPos - loopIn) - len * floor((rawPos - loopIn) / len))
+    // We use floored-mod (not fmod) so positions behind loopIn wrap correctly.
+    const loopInN  = el.const({ key: `${s.id}_lin`,  value: s.loopIn });
+    const loopLen  = el.const({ key: `${s.id}_llen`, value: s.loopOut - s.loopIn });
+    const rel      = el.sub(rawPos, loopInN);
+    const wrapped  = el.sub(rel, el.mul(loopLen, el.floor(el.div(rel, loopLen))));
+    position       = el.add(loopInN, wrapped);
+  } else {
+    position = rawPos;
+  }
 
   const leftRaw = el.table({ key: `${s.id}_tblL`, path: pathL }, position);
   const rightRaw = el.table({ key: `${s.id}_tblR`, path: pathR }, position);

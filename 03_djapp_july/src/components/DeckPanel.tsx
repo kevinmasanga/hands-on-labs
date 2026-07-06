@@ -60,7 +60,15 @@ export default function DeckPanel({ deck, label, ensureAudio }: Props) {
       <div className="track-name">{track ? track.name : 'No track loaded'}</div>
 
       <div className="waveform-wrap">
-        <Waveform peaks={track?.peaks ?? null} position={deck.position} onSeek={deck.seek} />
+        <Waveform
+          peaks={track?.peaks ?? null}
+          position={deck.position}
+          onSeek={deck.seek}
+          cueNorm={deck.state.cueNorm}
+          loopIn={deck.state.loopIn}
+          loopOut={deck.state.loopOut}
+          loopActive={deck.state.loopActive}
+        />
       </div>
 
       <div className="transport">
@@ -74,6 +82,41 @@ export default function DeckPanel({ deck, label, ensureAudio }: Props) {
         <span className="time">
           {track ? `${fmt(deck.position * track.duration)} / ${fmt(track.duration)}` : '0:00 / 0:00'}
         </span>
+      </div>
+
+      <div className="cue-loop-row">
+        <button className="btn ghost" onClick={deck.setCue} disabled={!track}>
+          Set Cue
+        </button>
+        <button
+          className="btn ghost"
+          onClick={deck.jumpToCue}
+          disabled={deck.state.cueNorm < 0}
+        >
+          ⏮ Cue
+        </button>
+        {deck.state.cueNorm >= 0 && track && (
+          <span className="cue-label">Cue: {fmt(deck.state.cueNorm * track.duration)}</span>
+        )}
+
+        <button className="btn ghost" onClick={deck.setLoopIn} disabled={!track}>
+          Loop In
+        </button>
+        <button className="btn ghost" onClick={deck.setLoopOut} disabled={!track}>
+          Loop Out
+        </button>
+        <button
+          className={`btn ghost${deck.state.loopActive ? ' active' : ''}`}
+          onClick={deck.toggleLoop}
+          disabled={deck.state.loopIn < 0 || deck.state.loopOut <= deck.state.loopIn}
+        >
+          ⟳ Loop {deck.state.loopActive ? 'ON' : 'OFF'}
+        </button>
+        {deck.state.loopIn >= 0 && deck.state.loopOut > deck.state.loopIn && track && (
+          <span className="loop-range">
+            {fmt(deck.state.loopIn * track.duration)} – {fmt(deck.state.loopOut * track.duration)}
+          </span>
+        )}
       </div>
 
       {error && <p className="error">{error}</p>}

@@ -30,6 +30,15 @@ export default function DeckControls({ deck }: { deck: UseDeck }) {
         onChange={deck.setFilter}
         format={filterLabel}
       />
+      <Knob
+        label="TEMPO"
+        value={state.tempo}
+        min={0.5}
+        max={1.5}
+        defaultValue={1}
+        onChange={deck.setTempo}
+        format={(v) => `${Math.round(v * 100)}%`}
+      />
       <Fader value={state.volume} level={level} onChange={deck.setVolume} />
     </div>
   );

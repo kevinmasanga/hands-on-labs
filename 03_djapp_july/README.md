@@ -49,6 +49,7 @@ Complete the prerequisite tasks of [Get started with IBM Bob](get-started-with-i
 - [Task 4: Explore the starting application](#task04)
 - [Task 5: Implement the plan](#task05)
 - [Task 6: Revisit the implementation plan](#task06)
+- [Development notes](#dev-notes)
 - [Summary](#summary)
 - [More resources](#additional-resources)
 
@@ -325,6 +326,77 @@ Follow these steps to use the grill-me skill in Bob's Advanced mode to revisit t
 The following image shows an example of the results of the grilling session.
 
 ![Grilling complete](images/grilling.png)
+
+[Back to the top](#top)
+
+***
+
+<a name="dev-notes"></a>
+
+## Development notes
+
+This section covers the commands and Git workflow you need when contributing to the project outside of the guided lab tasks.
+
+### Install dependencies
+
+After cloning the repository, install the Node.js dependencies before running or building the app:
+
+```bash
+npm install
+```
+
+> **Note:** Node.js 18 or later is required. If `node --version` returns an older version, or the command is not found, download and install Node.js from [nodejs.org](https://nodejs.org) before continuing.
+
+### Run the development server
+
+```bash
+npm run dev
+```
+
+Open the URL shown in the terminal (typically `http://localhost:5173/`) in your browser, then click **Load track**. The browser requires a user gesture before it can start the audio engine.
+
+### Verify the build before committing
+
+The project uses TypeScript in strict mode. Run the following command to typecheck and catch errors before you push:
+
+```bash
+npm run build
+```
+
+Fix any errors reported before opening a pull request.
+
+### Create a feature branch
+
+Create a branch from `main` for each piece of work. Use the `feature/<your-name>-<short-description>` naming pattern to keep branches identifiable:
+
+```bash
+git checkout main
+git pull origin main
+git checkout -b feature/<your-name>-<short-description>
+```
+
+### Write clear commit messages
+
+Keep commit messages short and descriptive so reviewers can follow your changes at a glance:
+
+```bash
+git add .
+git commit -m "feat: describe what you changed and why"
+```
+
+### Push changes and open a pull request
+
+1. Push your branch to the remote repository:
+
+   ```bash
+   git push origin feature/<your-name>-<short-description>
+   ```
+
+2. Go to the repository on GitHub and click **Compare & pull request** on the banner that appears after you push.
+
+3. Set the **base branch** to `main` and confirm the **compare branch** is your feature branch.
+
+4. Add a short title and a description that explains what you changed and why, then click **Create pull request**.
 
 [Back to the top](#top)
 

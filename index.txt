@@ -1,0 +1,305 @@
+# ============================================
+# 1. Clone your fork
+# ============================================
+
+git clone https://github.com/YOUR_USERNAME/repository.git
+
+# Downloads the repository from GitHub to your computer.
+# It also creates a remote named "origin" that points to your fork.
+
+
+# ============================================
+# 2. Enter the project directory
+# ============================================
+
+cd repository
+
+# Changes your current working directory into the cloned project.
+
+
+# ============================================
+# 3. Add the original repository
+# ============================================
+
+git remote add upstream https://github.com/ORIGINAL_OWNER/repository.git
+
+# Adds another remote called "upstream".
+# This points to the original project so you can receive future updates.
+
+
+# ============================================
+# 4. Verify remotes
+# ============================================
+
+git remote -v
+
+# Lists all configured remotes.
+# You should see:
+# origin   -> your fork
+# upstream -> original repository
+
+
+# ============================================
+# 5. Download updates from upstream
+# ============================================
+
+git fetch upstream
+
+# Downloads the latest commits from the original repository.
+# It DOES NOT modify your local files.
+
+
+# ============================================
+# 6. Switch to main branch
+# ============================================
+
+git checkout main
+
+# Moves you to the main branch.
+# (Modern Git also supports: git switch main)
+
+
+# ============================================
+# 7. Merge updates into main
+# ============================================
+
+git merge upstream/main
+
+# Combines the latest changes from the original repository
+# into your local main branch.
+
+
+# ============================================
+# 8. Push updated main to your fork
+# ============================================
+
+git push origin main
+
+# Uploads your updated main branch to your GitHub fork.
+
+
+# ============================================
+# 9. Create a new feature branch
+# ============================================
+
+git checkout -b feature/login-page
+
+# Creates a new branch and switches to it immediately.
+# Never work directly on main.
+
+
+# ============================================
+# 10. Check repository status
+# ============================================
+
+git status
+
+# Shows:
+# - Modified files
+# - New files
+# - Deleted files
+# - Files ready to commit
+# - Current branch
+
+
+# ============================================
+# 11. View differences
+# ============================================
+
+git diff
+
+# Displays the exact changes you've made
+# that haven't been staged yet.
+
+
+# ============================================
+# 12. Stage all changes
+# ============================================
+
+git add .
+
+# Adds ALL changed files to the staging area.
+# Think of staging as selecting what will go into the next commit.
+
+
+# Stage one file only
+
+git add filename.ext
+
+# Adds only the specified file.
+
+
+# ============================================
+# 13. Commit changes
+# ============================================
+
+git commit -m "Add login page"
+
+# Saves a snapshot of the staged changes
+# together with a descriptive message.
+
+
+# ============================================
+# 14. Upload your branch
+# ============================================
+
+git push origin feature/login-page
+
+# Sends your branch to your GitHub fork.
+# GitHub can now create a Pull Request from it.
+
+
+# ============================================
+# 15. Pull latest changes from your fork
+# ============================================
+
+git pull origin main
+
+# Downloads and merges the latest changes
+# from your own GitHub fork into your local branch.
+
+
+# ============================================
+# 16. View commit history
+# ============================================
+
+git log
+
+# Shows the history of commits,
+# including author, date, and commit message.
+
+
+# Short version
+
+git log --oneline
+
+# Displays a compact list of commits.
+
+
+# ============================================
+# 17. Show existing branches
+# ============================================
+
+git branch
+
+# Lists all local branches.
+# The current branch is marked with *.
+
+
+# Show local and remote branches
+
+git branch -a
+
+# Lists both local and remote branches.
+
+
+# ============================================
+# 18. Switch branches
+# ============================================
+
+git checkout main
+
+# Switches to an existing branch.
+
+
+# Modern alternative
+
+git switch main
+
+# Same purpose as checkout but dedicated to switching branches.
+
+
+# ============================================
+# 19. Delete a local branch
+# ============================================
+
+git branch -d feature/login-page
+
+# Deletes the branch after it has been merged.
+
+
+# Force delete
+
+git branch -D feature/login-page
+
+# Deletes the branch even if it hasn't been merged.
+
+
+# ============================================
+# 20. Remove a remote branch
+# ============================================
+
+git push origin --delete feature/login-page
+
+# Deletes the branch from GitHub.
+
+
+# ============================================
+# 21. Check remote information
+# ============================================
+
+git remote show origin
+
+# Displays detailed information about your fork.
+
+
+git remote show upstream
+
+# Displays information about the original repository.
+
+
+# ============================================
+# 22. Fetch everything
+# ============================================
+
+git fetch --all
+
+# Downloads updates from ALL configured remotes.
+
+
+# ============================================
+# 23. Pull updates from upstream
+# ============================================
+
+git pull upstream main
+
+# Fetches and merges the latest changes
+# from the original repository into your current branch.
+
+
+# ============================================
+# 24. Undo staging
+# ============================================
+
+git restore --staged filename.ext
+
+# Removes a file from the staging area
+# without deleting your work.
+
+
+# ============================================
+# 25. Discard local changes
+# ============================================
+
+git restore filename.ext
+
+# Restores the file to its last committed state.
+# WARNING: Local edits are lost.
+
+
+# ============================================
+# 26. Check configured remotes
+# ============================================
+
+git remote
+
+# Lists only the names of configured remotes.
+
+
+# ============================================
+# 27. Check current branch
+# ============================================
+
+git branch --show-current
+
+# Prints the name of the branch you're currently on.
